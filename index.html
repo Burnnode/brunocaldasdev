@@ -80,10 +80,13 @@
         }
 
         .btn {
-            display: inline-block;
-            padding: 0.9rem 2rem; /* Padding ajustado */
+            display: inline-flex; /* Alterado para inline-flex para alinhar com o ícone */
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem; /* Espaço entre ícone e texto */
+            padding: 0.9rem 2rem;
             border-radius: var(--border-radius);
-            font-weight: 500; /* Usar Poppins também para botões */
+            font-weight: 500;
             font-family: 'Poppins', sans-serif;
             transition: var(--transition);
             border: 2px solid var(--accent-primary);
@@ -92,7 +95,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             font-size: 0.9rem;
-            box-shadow: 0 0 0px var(--accent-primary); /* Sombra inicial pequena */
+            box-shadow: 0 0 0px var(--accent-primary);
         }
 
         .btn:hover {
@@ -102,6 +105,11 @@
             transform: translateY(-3px);
         }
         
+        .btn svg { /* Estilo para ícones dentro dos botões */
+            width: 18px;
+            height: 18px;
+        }
+
         .btn-secondary { /* Um botão com estilo alternativo */
             background-color: var(--accent-secondary);
             border-color: var(--accent-secondary);
@@ -360,7 +368,7 @@
             scrollbar-width: thin;
             scrollbar-color: var(--accent-primary) var(--bg-elements);
             background-color: var(--bg-main);
-            scroll-behavior: smooth; /* <<< Adicionado para a animação do JS */
+            scroll-behavior: smooth; 
         }
         
         .project-carousel::-webkit-scrollbar {
@@ -389,7 +397,7 @@
             transition: transform 0.5s ease-out;
         }
         .project-card:hover .carousel-slide img {
-            transform: scale(1.05); /* Zoom um pouco menor para 'contain' */
+            transform: scale(1.05);
         }
         
         .project-content {
@@ -416,7 +424,7 @@
             gap: 0.6rem;
         }
         .project-card .tech-stack span {
-            background-color: rgba(0, 240, 255, 0.08); /* Fundo ciano bem sutil */
+            background-color: rgba(0, 240, 255, 0.08); 
             color: var(--accent-primary);
             padding: 0.4rem 0.8rem;
             border-radius: 20px;
@@ -424,7 +432,7 @@
             font-weight: 500;
             border: 1px solid rgba(0, 240, 255, 0.2);
         }
-        .project-links { margin-top: auto; } /* Alinhar botões na base */
+        .project-links { margin-top: auto; } 
         .project-links .btn { font-size: 0.8rem; padding: 0.7rem 1.5rem; }
 
 
@@ -483,15 +491,33 @@
             color: var(--text-secondary); 
             text-align: center; 
             max-width:600px; 
-            margin:0 auto 3rem auto;
+            margin:0 auto 2rem auto;
             font-size: 1.05rem;
+        }
+        .contact-methods { 
+            text-align: center;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .contact-methods .btn {
+            background-color: var(--bg-elements);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        .contact-methods .btn:hover {
+            border-color: var(--accent-primary);
+            background-color: var(--accent-primary);
+            color: var(--bg-main);
         }
 
         .contact-form {
             max-width: 700px;
             margin: 0 auto;
             background: var(--bg-elements);
-            padding: 3rem; /* Mais padding */
+            padding: 3rem; 
             border-radius: var(--border-radius);
             box-shadow: 0 15px 40px rgba(0,0,0,0.3);
             border: 1px solid var(--border-color);
@@ -510,7 +536,7 @@
         .form-group input, .form-group textarea {
             width: 100%;
             padding: 1rem;
-            border-radius: calc(var(--border-radius) - 2px); /* Borda interna um pouco menor */
+            border-radius: calc(var(--border-radius) - 2px); 
             border: 1px solid var(--border-color);
             background: var(--bg-main); 
             color: var(--text-primary);
@@ -529,6 +555,13 @@
             width: 100%;
             font-size: 1rem;
             padding: 1rem;
+            background-color: var(--accent-primary);
+            color: var(--bg-main);
+            border-color: var(--accent-primary);
+        }
+        .contact-form .btn:hover {
+            background-color: transparent;
+            color: var(--accent-primary);
         }
 
         .social-links {
@@ -799,7 +832,20 @@
         <div class="container">
             <h2 class="section-title">Vamos Criar Algo <span>Incrível?</span></h2>
             <p class="reveal-on-scroll">Estou sempre aberto a novas oportunidades, colaborações e desafios. Se você tem um projeto em mente ou gostaria de saber mais sobre meu trabalho, adoraria conversar.</p>
-            <form id="contactForm" class="contact-form reveal-on-scroll" data-delay="100">
+            
+            <div class="contact-methods reveal-on-scroll" data-delay="50">
+                <a href="https://wa.me/5511985147943?text=Ol%C3%A1%2C%20vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20conversar." target="_blank" rel="noopener noreferrer" class="btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.001.004l-1.017 3.717l3.727-1.011z"></path></svg>
+                    WhatsApp
+                </a>
+                <a href="mailto:bruno.caldasm03@gmail.com" class="btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z"></path></svg>
+                    Email
+                </a>
+            </div>
+            <p class="reveal-on-scroll" data-delay="100" style="text-align:center; font-size: 0.9rem;">...ou preencha o formulário abaixo.</p>
+            
+            <form id="contactForm" class="contact-form reveal-on-scroll" data-delay="150">
                 <div class="form-group">
                     <label for="name">Seu Nome</label>
                     <input type="text" id="name" name="name" placeholder="Nome Completo" required>
@@ -819,7 +865,7 @@
                 <button type="submit" class="btn">Enviar Mensagem</button>
             </form>
             <div class="social-links reveal-on-scroll" data-delay="200">
-                <a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+                <a href="https://www.linkedin.com/in/bruno-caldas-2449bb208/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
                     <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
                 </a>
                 <a href="#" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
@@ -920,7 +966,7 @@
             const subject = encodeURIComponent(document.getElementById('subject').value);
             const message = encodeURIComponent(document.getElementById('message').value);
             
-            const mailtoLink = `mailto:SEU_EMAIL_AQUI@example.com?subject=${subject} - Contato Portfólio (${name})&body=Nome: ${name}%0D%0AEmail: ${email}%0D%0A%0D%0AMensagem:%0D%0A${message}`;
+            const mailtoLink = `mailto:bruno.caldasm03@gmail.com?subject=${subject} - Contato Portfólio (${name})&body=Nome: ${name}%0D%0AEmail: ${email}%0D%0A%0D%0AMensagem:%0D%0A${message}`;
             
             window.location.href = mailtoLink;
         });
