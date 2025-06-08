@@ -213,7 +213,6 @@
             border-right: 15vw solid transparent; /* Metade da base desejada */
             border-bottom: 20vw solid var(--accent-primary); /* Altura e cor */
             top: 10%; left: 5%;
-            /* transform: rotate(15deg); // Rotação pode ser adicionada na animação */
         }
         .hero-background-shapes::after { /* Triângulo 2 (ex: apontando para baixo) */
             border-left: 12vw solid transparent;
@@ -221,7 +220,6 @@
             border-top: 18vw solid var(--accent-secondary); /* Aponta para baixo */
             bottom: 15%; right: 10%;
             animation-delay: -10s;
-            /* transform: rotate(-25deg); // Rotação pode ser adicionada na animação */
         }
         @keyframes floatShape { /* Animação ajustada para triângulos */
             0% { transform: translateY(0px) rotate(10deg) scale(0.9); }
@@ -339,11 +337,11 @@
         .project-card {
             background-color: var(--bg-elements);
             border-radius: var(--border-radius);
-            padding: 0; /* Padding será interno */
+            padding: 0;
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             transition: var(--transition);
             border: 1px solid var(--border-color);
-            overflow: hidden; /* Para o efeito da imagem */
+            overflow: hidden;
             display: flex;
             flex-direction: column;
         }
@@ -352,21 +350,46 @@
             box-shadow: 0 12px 30px rgba(0,0,0,0.3), var(--shadow-strong);
             border-color: var(--accent-primary);
         }
-        .project-thumbnail-wrapper {
+        
+        /* Estilos do Carrossel */
+        .project-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
             height: 220px;
-            overflow: hidden;
-            position: relative;
+            scrollbar-width: thin; /* Para Firefox */
+            scrollbar-color: var(--accent-primary) var(--bg-elements); /* Para Firefox */
         }
-        .project-card img.project-thumbnail {
+        /* Estilizando a barra de rolagem para navegadores WebKit (Chrome, Safari) */
+        .project-carousel::-webkit-scrollbar {
+            height: 8px;
+        }
+        .project-carousel::-webkit-scrollbar-track {
+            background: var(--bg-elements);
+        }
+        .project-carousel::-webkit-scrollbar-thumb {
+            background-color: var(--accent-primary);
+            border-radius: 10px;
+            border: 2px solid var(--bg-elements);
+        }
+        
+        .carousel-slide {
+            flex: 0 0 100%;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel-slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s ease-out;
-            margin: 0; border-radius: 0; /* Reset de estilos anteriores */
         }
-        .project-card:hover img.project-thumbnail {
+        .project-card:hover .carousel-slide img {
             transform: scale(1.1);
         }
+        
         .project-content {
             padding: 1.75rem;
             display: flex;
@@ -660,7 +683,8 @@
             </div>
             <div class="about-image-wrapper reveal-on-scroll" data-delay="100">
                 <div class="about-image">
-                    <img src="https://placehold.co/300x300/0D0F12/00F0FF?text=BC&font=poppins" alt="Foto de Bruno Caldas">
+                    <!-- ADICIONE O LINK DA SUA FOTO AQUI -->
+                    <img src="https://i.imgur.com/SUYvI3c.png" alt="Foto de Bruno Caldas">
                 </div>
             </div>
         </div>
@@ -670,9 +694,22 @@
         <div class="container">
             <h2 class="section-title">Meus <span>Projetos</span></h2>
             <div class="projects-grid">
+                
+                <!-- PROJETO MLG APP -->
                 <div class="project-card reveal-on-scroll">
-                    <div class="project-thumbnail-wrapper">
-                        <img src="https://placehold.co/600x400/1A1C20/EAEAEA?text=MLG+App+Interface" alt="MLG App" class="project-thumbnail">
+                    <div class="project-carousel">
+                        <!-- IMAGEM 1 DO MLG APP -->
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/eBneA7D.png" alt="MLG App Screenshot 1">
+                        </div>
+                        <!-- IMAGEM 2 DO MLG APP -->
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/n6Iq7fI.png" alt="MLG App Screenshot 2">
+                        </div>
+                        <!-- IMAGEM 3 DO MLG APP -->
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/3p3Jd3x.png" alt="MLG App Screenshot 3">
+                        </div>
                     </div>
                     <div class="project-content">
                         <h3>Aplicativo MLG</h3>
@@ -686,9 +723,21 @@
                     </div>
                 </div>
 
+                <!-- PROJETO BETNELSON BOT -->
                 <div class="project-card reveal-on-scroll" data-delay="100">
-                    <div class="project-thumbnail-wrapper">
-                         <img src="https://placehold.co/600x400/1A1C20/EAEAEA?text=BetNelson+Bot+Telegram" alt="BetNelson Bot" class="project-thumbnail">
+                    <div class="project-carousel">
+                        <!-- IMAGEM 1 DO BETNELSON BOT -->
+                        <div class="carousel-slide">
+                             <img src="https://i.imgur.com/YQzJ1g7.png" alt="BetNelson Bot Screenshot 1">
+                        </div>
+                        <!-- IMAGEM 2 DO BETNELSON BOT -->
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/7gHqXzF.png" alt="BetNelson Bot Screenshot 2">
+                        </div>
+                        <!-- IMAGEM 3 DO BETNELSON BOT -->
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/bQ42vT7.png" alt="BetNelson Bot Screenshot 3">
+                        </div>
                     </div>
                     <div class="project-content">
                         <h3>BetNelson / Palpiteiro Bot</h3>
@@ -702,9 +751,21 @@
                     </div>
                 </div>
 
+                <!-- PROJETO AiPsico APP -->
                 <div class="project-card reveal-on-scroll" data-delay="200">
-                     <div class="project-thumbnail-wrapper">
-                        <img src="https://placehold.co/600x400/1A1C20/EAEAEA?text=AiPsico+App+AI" alt="AiPsico App" class="project-thumbnail">
+                     <div class="project-carousel">
+                        <!-- IMAGEM 1 DO AiPsico APP -->
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/G5g2fN7.png" alt="AiPsico App Screenshot 1">
+                        </div>
+                        <!-- IMAGEM 2 DO AiPsico APP -->
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/4Bw20h1.png" alt="AiPsico App Screenshot 2">
+                        </div>
+                        <!-- IMAGEM 3 DO AiPsico APP -->
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/5X0YJ1s.png" alt="AiPsico App Screenshot 3">
+                        </div>
                     </div>
                     <div class="project-content">
                         <h3>Aplicativo AiPsico</h3>
