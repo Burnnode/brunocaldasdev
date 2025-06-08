@@ -107,6 +107,12 @@
             width: 18px;
             height: 18px;
         }
+        
+        .btn.btn-small { /* Estilo para botões menores nos cards */
+            font-size: 0.8rem; 
+            padding: 0.7rem 1.5rem;
+        }
+
 
         .btn-secondary {
             background-color: var(--accent-secondary);
@@ -327,6 +333,19 @@
             border-color: var(--accent-primary);
         }
         
+        .project-thumbnail-wrapper {
+            height: 350px;
+            overflow: hidden;
+            position: relative;
+            background-color: var(--bg-main);
+        }
+        .project-thumbnail-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.5s ease-out;
+        }
+        
         /* Estilos do Carrossel */
         .project-carousel {
             display: flex;
@@ -364,7 +383,8 @@
             object-fit: contain;
             transition: transform 0.5s ease-out;
         }
-        .project-card:hover .carousel-slide img {
+        .project-card:hover .carousel-slide img,
+        .project-card:hover .project-thumbnail-wrapper img {
             transform: scale(1.05);
         }
         
@@ -400,10 +420,8 @@
             font-weight: 500;
             border: 1px solid rgba(230, 57, 70, 0.3);
         }
-        .project-links { margin-top: auto; } 
-        .project-links .btn { font-size: 0.8rem; padding: 0.7rem 1.5rem; }
-
-
+        .project-links { margin-top: auto; display: flex; flex-wrap: wrap; gap: 0.75rem; } 
+        
         /* Habilidades */
         #habilidades {
             background-color: var(--bg-elements);
@@ -688,13 +706,13 @@
                 <div class="project-card reveal-on-scroll">
                     <div class="project-carousel">
                         <div class="carousel-slide">
-                            <img src="https://i.imgur.com/FfDl6ip.png" alt="MLG App Screenshot 1">
+                            <img src="https://i.imgur.com/HLXShjM.png" alt="MLG App Screenshot 1">
                         </div>
                         <div class="carousel-slide">
-                            <img src="https://i.imgur.com/BGqQFS5.png" alt="MLG App Screenshot 2">
+                            <img src="https://i.imgur.com/3XwaDfF.png" alt="MLG App Screenshot 2">
                         </div>
                         <div class="carousel-slide">
-                            <img src="https://i.imgur.com/8DCiVsU.png" alt="MLG App Screenshot 3">
+                            <img src="https://i.imgur.com/IbHJNra.png" alt="MLG App Screenshot 3">
                         </div>
                     </div>
                     <div class="project-content">
@@ -704,7 +722,23 @@
                             <span>FlutterFlow</span><span>Firebase</span><span>Supabase</span><span>Unity Ads</span><span>API</span>
                         </div>
                         <div class="project-links">
-                            <a href="#" class="btn btn-small" target="_blank" rel="noopener noreferrer">Ver Detalhes (Exemplo)</a>
+                            <a href="https://play.google.com/store/apps/details?id=com.mycompany.mlgtesteb&hl=pt_BR" class="btn btn-small" target="_blank" rel="noopener noreferrer">Google Play</a>
+                            <a href="https://apps.apple.com/br/app/mlg/id6738962077" class="btn btn-small" target="_blank" rel="noopener noreferrer">App Store</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROJETO CHECKOUT -->
+                <div class="project-card reveal-on-scroll" data-delay="50">
+                    <div class="project-thumbnail-wrapper">
+                        <!-- ADICIONE O LINK DA IMAGEM DO CHECKOUT AQUI -->
+                        <img src="https://placehold.co/600x400/2e2e2e/fefefe?text=MLG+Checkout" alt="Interface de Checkout" >
+                    </div>
+                    <div class="project-content">
+                        <h3>Checkout de Pagamentos</h3>
+                        <p class="project-description">Interface de pagamentos e checkout desenvolvida em FlutterFlow para o projeto MLG, com integração a múltiplas APIs de pagamento como Asaas, Zendry e Mercado Pago para processamento de transações.</p>
+                        <div class="tech-stack">
+                            <span>FlutterFlow</span><span>Asaas API</span><span>Zendry API</span><span>Mercado Pago API</span>
                         </div>
                     </div>
                 </div>
@@ -729,7 +763,7 @@
                             <span>n8n</span><span>Supabase</span><span>OpenAI</span><span>Telegram API</span><span>Node.js</span>
                         </div>
                          <div class="project-links">
-                            <a href="#" class="btn btn-small" target="_blank" rel="noopener noreferrer">Ver no Telegram (Exemplo)</a>
+                            <a href="https://web.telegram.org/k/#@betnelsontestebot" class="btn btn-small" target="_blank" rel="noopener noreferrer">Testar Bot Gratuito</a>
                         </div>
                     </div>
                 </div>
@@ -751,10 +785,10 @@
                         <h3>Aplicativo AiPsico</h3>
                         <p class="project-description">Plataforma que permite a psicólogos criar avatares de IA para interagir com pacientes. Inclui painel ADM e app móvel com interface clean. Lançado nas lojas de aplicativos.</p>
                         <div class="tech-stack">
-                            <span>FlutterFlow</span><span>Firebase</span><span>IA</span><span>UI/UX Design</span><span>Mobile</span>
+                            <span>FlutterFlow</span><span>Supabase</span><span>IA</span><span>UI/UX Design</span><span>Mobile</span>
                         </div>
                          <div class="project-links">
-                            <a href="https://play.google.com/store/apps/details?id=com.mycompany.aipsico&pcampaignid=web_share" class="btn btn-small" target="_blank" rel="noopener noreferrer">Google Play</a>
+                            <a href="https://play.google.com/store/apps/details?id=com.mycompany.aipsico&hl=pt_BR" class="btn btn-small" target="_blank" rel="noopener noreferrer">Google Play</a>
                             <a href="https://apps.apple.com/br/app/aipsico/id6745515520" class="btn btn-small" target="_blank" rel="noopener noreferrer">App Store</a>
                         </div>
                     </div>
@@ -772,13 +806,16 @@
                 <span class="skill-badge reveal-on-scroll" data-delay="100">Supabase</span>
                 <span class="skill-badge reveal-on-scroll" data-delay="150">n8n Automação</span>
                 <span class="skill-badge reveal-on-scroll" data-delay="200">Integração de APIs</span>
-                <span class="skill-badge reveal-on-scroll" data-delay="250">OpenAI API</span>
-                <span class="skill-badge reveal-on-scroll" data-delay="300">Telegram Bots</span>
-                <span class="skill-badge reveal-on-scroll" data-delay="350">Node.js (Básico)</span>
-                <span class="skill-badge reveal-on-scroll" data-delay="400">Unity Ads</span>
-                <span class="skill-badge reveal-on-scroll" data-delay="450">Desenvolvimento Mobile</span>
-                <span class="skill-badge reveal-on-scroll" data-delay="500">SQL</span>
-                <span class="skill-badge reveal-on-scroll" data-delay="550">Design UI/UX (Conceitos)</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="250">Asaas API</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="300">Zendry API</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="350">Mercado Pago API</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="400">OpenAI API</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="450">Telegram Bots</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="500">Node.js (Básico)</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="550">Unity Ads</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="600">Desenvolvimento Mobile</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="650">SQL</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="700">Design UI/UX (Conceitos)</span>
             </div>
         </div>
     </section>
