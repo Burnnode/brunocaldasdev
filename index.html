@@ -1,1010 +1,1030 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SANYZATION - Adivinhe o Personagem</title>
-    
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bruno Caldas - Desenvolvedor Full-Stack e Soluções Digitais</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Reset e Estilos Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <!-- 3. TODO O CSS (Estilos com Design 2025) -->
-    <style>
-        /* --- Reset Básico e Tema Escuro --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        :root {
+            /* Paleta de Cores - ROXO / CIANO - ATUALIZADO */
+            --bg-main: #121212; /* Preto Carvão */
+            --bg-elements: #2e2e2e; /* Cinza Queimado */
+            --accent-primary: #8A2BE2; /* Azul Violeta (Roxo) */
+            --accent-secondary: #00FFFF; /* Ciano Elétrico */
+            --text-primary: #fefefe; /* Branco Suave */
+            --text-secondary: #b0b0b0; /* Um cinza claro que complementa o branco suave */
+            --border-color: #444444; /* Um cinza um pouco mais visível que o bg-elements */
+            
+            --shadow-soft: 0 4px 15px rgba(138, 43, 226, 0.1); /* Sombra ajustada para o roxo */
+            --shadow-strong: 0 8px 25px rgba(138, 43, 226, 0.15); /* Sombra ajustada para o roxo */
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --border-radius: 8px;
+        }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000000; /* Fundo preto sólido */
-            color: #E0E0E0;
-            display: flex;
-            min-height: 100vh;
-            overflow: hidden; /* Impede o scroll da página inteira */
-        }
+        html {
+            scroll-behavior: smooth;
+        }
 
-        /* O RASTRO/BRILHO DO MOUSE FOI REMOVIDO DAQUI */
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            background-color: var(--bg-main);
+            color: var(--text-secondary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-        /* Layout de App com Sidebar */
-        .app-layout {
-            display: grid;
-            grid-template-columns: 280px 1fr; /* Sidebar fixa, conteúdo flexível */
-            width: 100%;
-            height: 100vh;
-        }
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
 
-        /* Barra Lateral de Navegação */
-        #sidebar {
-            background-color: rgba(10, 0, 0, 0.75); /* Vidro fosco vermelho-preto */
-            backdrop-filter: blur(12px) saturate(140%);
-            border-right: 1px solid #6b1a1a;
-            box-shadow: 0 0 20px rgba(229, 62, 62, 0.1);
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            height: 100%;
-            overflow-y: auto;
-            z-index: 100; 
-        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text-primary);
+        }
 
-        /* (MUDANÇA) Estilo do Logo na Sidebar */
-        .sidebar-logo {
-            width: 90%;
-            max-width: 220px;
-            margin: 0 auto 20px auto;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        .sidebar-logo:hover {
-            transform: scale(1.05);
-        }
+        h1 { font-size: clamp(2.8rem, 6vw, 4rem); }
+        h2 { font-size: clamp(2.2rem, 5vw, 3rem); margin-bottom: 1.5rem; }
+        h3 { font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 1rem; }
 
-        .modo-botao {
-            background-color: transparent;
-            border: 1px solid #6b1a1a;
-            border-radius: 8px;
-            padding: 20px;
-            text-decoration: none;
-            color: #E0E0E0;
-            transition: all 0.2s ease-in-out;
-            cursor: pointer;
-            text-align: left;
-        }
-        .modo-botao:hover {
-            transform: scale(1.03);
-            border-color: #E53E3E;
-            background-color: #2a0a0a;
-            box-shadow: 0 5px 20px rgba(229, 62, 62, 0.2);
-        }
-        .modo-botao h2 { font-size: 1.2rem; margin-bottom: 5px; }
-        .modo-botao p { font-size: 0.9rem; color: #A0AEC0; }
-        .modo-botao.maratona h2 { color: #ffc400; }
-        
-        .modo-botao.ativo {
-            border-left: 4px solid #E53E3E;
-            background-color: #2a0a0a;
-        }
+        p {
+            margin-bottom: 1.25rem;
+        }
 
-        /* Área de Conteúdo Principal (Direita) */
-        #main-content {
-            height: 100vh;
-            overflow-y: auto;
-            padding: 40px;
-            
-            background-image: 
-                url('https://eqisfdigrutdfhrfyjly.supabase.co/storage/v1/object/public/personagens/capa%20do%20SANYDLE%20(1).png');
-            background-size: cover;
-            background-position: center top; 
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            
-            display: flex;
-            justify-content: center;
-        }
+        a {
+            text-decoration: none;
+            color: var(--accent-primary);
+            transition: var(--transition);
+            font-weight: 500;
+        }
+        a:hover { 
+            color: var(--text-primary);
+        }
 
-        .pagina {
-            width: 100%;
-            max-width: 800px;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            
-            background-color: rgba(10, 0, 0, 0.65);
-            backdrop-filter: blur(10px) saturate(120%);
-            padding: 20px 30px;
-            border-radius: 12px;
-            border: 1px solid #6b1a1a;
-            box-shadow: 0 0 20px rgba(229, 62, 62, 0.1);
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.9rem 2rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            transition: var(--transition);
+            border: 2px solid var(--accent-primary);
+            background-color: transparent;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            box-shadow: 0 0 0px var(--accent-primary);
+        }
 
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
-        }
-        
-        .pagina.visivel {
-            display: flex;
-            opacity: 1;
-            visibility: visible;
-        }
+        .btn:hover {
+            background-color: var(--accent-primary);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-strong);
+            transform: translateY(-3px);
+        }
+        
+        .btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        
+        .btn.btn-small { /* Estilo para botões menores nos cards */
+            font-size: 0.8rem; 
+            padding: 0.7rem 1.5rem;
+        }
 
-        /* Media query para telas menores (celular) */
-        @media (max-width: 768px) {
-            .app-layout {
-                grid-template-columns: 1fr;
-                height: auto;
-                min-height: 100vh;
-            }
-            #sidebar {
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid #6b1a1a;
-                padding: 20px;
-                z-index: 10; 
-            }
-            #main-content {
-                height: auto;
-                min-height: 100vh;
-                padding: 20px;
-            }
-            .modo-selecao { grid-template-columns: 1fr; }
-        }
 
-        /* --- 2. Estilos da Tela de Jogo (Geral) --- */
-        .tela-jogo-base { text-align: center; position: relative; } 
-        
-        .tela-jogo-base h1 { color: #E53E3E; font-size: 2.5rem; cursor: pointer; }
-        .contador-acertos { font-size: 1.5rem; font-weight: bold; color: #38A169; margin-bottom: 10px; }
-        .contador-acertos span { color: #E0E0E0; }
+        .btn-secondary {
+            background-color: var(--accent-secondary);
+            border-color: var(--accent-secondary);
+            color: var(--bg-main);
+        }
+        .btn-secondary:hover {
+            background-color: transparent;
+            color: var(--accent-secondary);
+            box-shadow: 0 0 15px var(--accent-secondary);
+        }
 
-        .form-palpite-container { width: 100%; max-width: 500px; position: relative; }
-        .campo-palpite {
-            width: 100%;
-            padding: 15px;
-            font-size: 1rem;
-            background-color: #2a0a0a;
-            border: 1px solid #6b1a1a;
-            color: #FFF;
-            border-radius: 8px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        .campo-palpite:focus { 
-            border-color: #E53E3E;
-            box-shadow: 0 0 10px rgba(229, 62, 62, 0.3);
-        }
-        .campo-palpite:disabled { background-color: #1A202C; cursor: not-allowed; }
 
-        .sugestoes-autocomplete {
-            position: absolute;
-            width: 100%;
-            background-color: #2a0a0a;
-            border: 1px solid #6b1a1a;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            z-index: 10;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .sugestao-item { padding: 12px 15px; color: #E0E0E0; cursor: pointer; text-align: left; }
-        .sugestao-item:hover { background-color: #6b1a1a; }
-        .sugestao-item:not(:last-child) { border-bottom: 1px solid #6b1a1a; }
+        /* Header */
+        header {
+            background-color: rgba(46, 46, 46, 0.85); /* --bg-elements com transparência */
+            backdrop-filter: blur(10px);
+            padding: 1.25rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+        header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 1.7rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-primary);
+        }
+        .logo span { color: var(--accent-primary); }
 
-        /* 2c. Grade de Palpites (Modo Original) */
-        .grade-palpites { width: 100%; display: flex; flex-direction: column; gap: 8px; }
-        .linha-palpite-header, .linha-palpite { display: grid; grid-template-columns: 2fr 1.5fr 1.5fr 1.5fr; gap: 8px; width: 100%; }
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+        nav ul li a {
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-secondary);
+            padding: 0.5rem 0;
+            position: relative;
+            letter-spacing: 0.5px;
+        }
+        nav ul li a:hover {
+            color: var(--accent-primary);
+            text-shadow: none;
+        }
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 2px;
+            background-color: var(--accent-primary);
+            transition: width 0.3s ease;
+        }
+        nav ul li a:hover::after, nav ul li a.active::after {
+            width: 100%;
+        }
+        nav ul li a.active {
+            color: var(--accent-primary);
+        }
 
-        @media (max-width: 600px) {
-            .linha-palpite-header, .linha-palpite { grid-template-columns: 1fr; gap: 5px; }
-            .linha-palpite-header { display: none; }
-            .linha-palpite { grid-template-columns: 1fr; border: 1px solid #6b1a1a; border-radius: 8px; padding: 10px; }
-            .celula { padding: 8px; display: flex; justify-content: center; white-space: normal; }
-            .celula.nome::before { content: 'Nome: '; font-weight: bold; color: #A0AEC0; margin-right: 10px; }
-            .celula.elemento::before { content: 'Elemento: '; font-weight: bold; color: #A0AEC0; margin-right: 10px; }
-            .celula.temporada::before { content: 'Temporada: '; font-weight: bold; color: #A0AEC0; margin-right: 10px; }
-            .celula.tipo::before { content: 'Tipo: '; font-weight: bold; color: #A0AEC0; margin-right: 10px; }
-        }
+        .mobile-menu-toggle { 
+            display: none;
+            color: var(--accent-primary);
+            font-size: 2rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
 
-        .linha-palpite-header .celula { background-color: transparent; font-weight: bold; color: #A0AEC0; font-size: 0.9rem; text-transform: uppercase; }
-        .celula {
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 500;
-            text-align: center;
-            white-space: normal;
-            word-break: break-word;
-            background-color: #441a1a; 
-            color: #FFF;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            
-            opacity: 0;
-            transform: scale(0.9);
-            animation: revealCell 0.5s ease forwards;
-        }
-        
-        @keyframes revealCell {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .elemento-icon { width: 20px; height: 20px; flex-shrink: 0; }
-        .celula.verde { background-color: #38A169; }
-        .celula.amarelo { background-color: #D69E2E; }
+        /* Hero Section */
+        .hero {
+            min-height: 90vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 4rem 0;
+            background-color: var(--bg-main);
+            /* Gradient ajustado para as novas cores */
+            background-image: radial-gradient(circle at 15% 50%, rgba(138, 43, 226, 0.1), transparent 30%),
+                              radial-gradient(circle at 85% 40%, rgba(0, 255, 255, 0.1), transparent 30%);
+        }
 
-        /* --- 3. ESTILOS DO MODO IMAGEM --- */
-        .imagem-container { width: 100%; max-width: 500px; aspect-ratio: 1 / 1; background-color: #1A202C; border-radius: 8px; overflow: hidden; border: 1px solid #6b1a1a; margin-bottom: 20px; }
-        
-        #personagem-imagem-diario, #personagem-imagem-maratona {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            transition: filter 0.5s ease-out;
-        }
+        .hero .container { position: relative; z-index: 1;}
+        .hero h1 {
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            color: var(--text-primary);
+        }
+        .hero h1 span {
+            color: var(--accent-primary);
+            text-shadow: 0 0 15px var(--accent-primary);
+        }
 
-        .lista-palpites-imagem { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 8px; }
-        .item-palpite-imagem {
-            background-color: #2a0a0a;
-            border: 1px solid #6b1a1a;
-            border-radius: 6px;
-            padding: 12px 15px;
-            font-size: 1rem;
-            text-align: center;
-            color: #E0E0E0;
-            opacity: 0;
-            transform: scale(0.9);
-            animation: revealCell 0.5s ease forwards;
-        }
-        .item-palpite-imagem.correto { background-color: #38A169; border-color: #2F855A; font-weight: bold; }
+        .hero .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2.5rem;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        .hero .btn {
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+        }
 
-        /* --- 4. Modal de Mensagem (Toast) --- */
-        #modal-mensagem { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background-color: #2D3748; color: white; padding: 15px 25px; border-radius: 8px; border: 1px solid #4A5568; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease; pointer-events: none; }
-        #modal-mensagem.vitoria { background-color: #38A169; border-color: #2F855A; }
-        #modal-mensagem.erro { background-color: #C53030; border-color: #9B2C2C; }
-        #modal-mensagem.visivel { opacity: 1; visibility: visible; }
+        /* Seções */
+        section {
+            padding: 6rem 0;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+            color: var(--text-primary);
+            font-size: clamp(2rem, 4vw, 2.5rem);
+        }
+        .section-title span {
+            color: var(--accent-primary);
+        }
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 50px;
+            height: 3px;
+            /* Gradient ajustado para as novas cores */
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            margin: 0.75rem auto 0;
+            border-radius: 3px;
+        }
 
-        /* --- 5. TELA DE VITÓRIA --- */
-        #tela-vitoria {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(10, 0, 0, 0.95); 
-            z-index: 2000;
-            display: none;
-            justify-content: center; align-items: center;
-            flex-direction: column;
-            text-align: center;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        #tela-vitoria.visivel { display: flex; opacity: 1; visibility: visible; }
-        #tela-vitoria h2 { font-size: 4rem; color: #38A169; margin-bottom: 20px; }
-        #vitoria-texto { font-size: 1.2rem; color: #A0AEC0; margin-bottom: 40px; }
-        #btn-voltar-menu { background-color: #E53E3E; color: #FFF; padding: 15px 30px; font-size: 1.1rem; font-weight: bold; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
-        #btn-voltar-menu:hover { background-color: #C53030; }
-    </style>
+        /* Sobre Mim */
+        #sobre {
+             background-color: var(--bg-elements);
+             position: relative;
+        }
+        #sobre .container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            align-items: center;
+            gap: 4rem;
+        }
+        .about-content { order: 1; }
+        .about-image-wrapper {
+            order: 2;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .about-image-wrapper::before {
+            content: '';
+            position: absolute;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            max-width: 340px; max-height: 340px;
+            /* Cor ajustada para o secundário (Ciano) */
+            border: 2px solid var(--accent-secondary);
+            border-radius: 50%;
+            opacity: 0.5;
+            /* Sombra do pulso ajustada para o secundário (Ciano) */
+            animation: pulseRing 3s infinite ease-in-out;
+        }
+        @keyframes pulseRing {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.5); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(0, 255, 255, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 255, 0); }
+        }
+
+        .about-image img {
+            width: 100%;
+            max-width: 300px;
+            height: auto;
+            border-radius: 50%;
+            object-fit: cover;
+            aspect-ratio: 1/1;
+            border: 4px solid var(--bg-elements);
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Projetos */
+        #projetos {
+            background-color: var(--bg-main);
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 2.5rem;
+        }
+        .project-card {
+            background-color: var(--bg-elements);
+            border-radius: var(--border-radius);
+            padding: 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .project-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3), var(--shadow-strong);
+            /* Borda de hover ajustada para o primário (Roxo) */
+            border-color: var(--accent-primary);
+        }
+        
+        .project-thumbnail-wrapper {
+            height: 350px;
+            overflow: hidden;
+            position: relative;
+            background-color: var(--bg-main);
+        }
+        .project-thumbnail-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.5s ease-out;
+        }
+        
+        /* Estilos do Carrossel */
+        .project-carousel {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            height: 350px; 
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-primary) var(--bg-elements);
+            background-color: var(--bg-main);
+            scroll-behavior: smooth; 
+        }
+        
+        .project-carousel::-webkit-scrollbar {
+            height: 8px;
+        }
+        .project-carousel::-webkit-scrollbar-track {
+            background: var(--bg-elements);
+        }
+        /* Cor da barra de rolagem ajustada para o primário (Roxo) */
+        .project-carousel::-webkit-scrollbar-thumb {
+            background-color: var(--accent-primary);
+            border-radius: 10px;
+            border: 2px solid var(--bg-elements);
+        }
+        
+        .carousel-slide {
+            flex: 0 0 100%;
+            width: 100%;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+        .carousel-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transition: transform 0.5s ease-out;
+        }
+        .project-card:hover .carousel-slide img,
+        .project-card:hover .project-thumbnail-wrapper img {
+            transform: scale(1.05);
+        }
+        
+        .project-content {
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .project-card h3 { 
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+        .project-card .project-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            flex-grow: 1;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        .project-card .tech-stack {
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+        /* Tags ajustadas para o primário (Roxo) */
+        .project-card .tech-stack span {
+            background-color: rgba(138, 43, 226, 0.1); 
+            color: var(--accent-primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid rgba(138, 43, 226, 0.3);
+        }
+        .project-links { margin-top: auto; display: flex; flex-wrap: wrap; gap: 0.75rem; } 
+        
+        /* Habilidades */
+        #habilidades {
+            background-color: var(--bg-elements);
+        }
+        .skills-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+        }
+        /* Badges ajustadas para o secundário (Ciano) */
+        .skill-badge {
+            background-color: var(--bg-main);
+            color: var(--accent-secondary);
+            padding: 0.7rem 1.4rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            border: 1px solid var(--accent-secondary);
+            font-size: 0.9rem;
+        }
+        .skill-badge:hover {
+            background-color: var(--accent-secondary);
+            color: var(--bg-main);
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2);
+        }
+
+        /* Contato */
+        #contato {
+            background: var(--bg-main);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #contato .container { position: relative; z-index: 1; }
+
+        #contato .section-title { color: var(--text-primary); }
+        /* Gradient ajustado para as novas cores */
+        #contato .section-title::after { background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)); }
+        #contato > .container > p {
+            color: var(--text-secondary); 
+            text-align: center; 
+            max-width:600px; 
+            margin:0 auto 2rem auto;
+            font-size: 1.05rem;
+        }
+        .contact-methods { 
+            text-align: center;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .contact-methods .btn {
+            background-color: var(--bg-elements);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        /* Hover ajustado para o primário (Roxo) */
+        .contact-methods .btn:hover {
+            border-color: var(--accent-primary);
+            background-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        .contact-form {
+            max-width: 700px;
+            margin: 0 auto;
+            background: var(--bg-elements);
+            padding: 3rem; 
+            border-radius: var(--border-radius);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color);
+        }
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border-radius: calc(var(--border-radius) - 2px); 
+            border: 1px solid var(--border-color);
+            background: var(--bg-main); 
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder { color: var(--text-secondary); opacity: 0.7; }
+        /* Focus e sombra ajustados para o primário (Roxo) */
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.3);
+            background-color: var(--bg-elements);
+        }
+        /* Botão de envio ajustado para o primário (Roxo) */
+        .contact-form .btn {
+            width: 100%;
+            font-size: 1rem;
+            padding: 1rem;
+            background-color: var(--accent-primary);
+            color: var(--text-primary);
+            border-color: var(--accent-primary);
+        }
+        .contact-form .btn:hover {
+            background-color: transparent;
+            color: var(--accent-primary);
+        }
+
+        .social-links {
+            text-align: center;
+            margin-top: 3.5rem;
+        }
+        .social-links a {
+            margin: 0 1rem;
+            display: inline-block;
+            color: var(--text-secondary);
+            font-size: 1.8rem;
+        }
+        /* Hover ajustado para o primário (Roxo) */
+        .social-links a:hover {
+            color: var(--accent-primary);
+            transform: scale(1.1) translateY(-3px);
+        }
+
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-elements);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 3rem 0;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+        }
+        footer p { color: var(--text-secondary); opacity: 0.8; margin-bottom: 0;}
+        footer .logo-footer {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        footer .logo-footer span { color: var(--accent-primary); }
+
+
+        /* Animação de Reveal */
+        .reveal-on-scroll {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+        .reveal-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        /* Responsividade */
+        @media (max-width: 992px) {
+            #sobre .container { 
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .about-content { order: 2; margin-top: 2rem;}
+            .about-image-wrapper { order: 1; margin: 0 auto; }
+            .section-title { text-align: center !important; margin-left: auto !important; margin-right: auto !important;}
+
+        }
+
+        @media (max-width: 768px) {
+            .logo { font-size: 1.5rem; }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            nav {
+                position: fixed;
+                top: 0;
+                left: -100%; 
+                width: 85%;
+                max-width: 320px;
+                height: 100vh;
+                background-color: var(--bg-elements);
+                box-shadow: 5px 0 20px rgba(0,0,0,0.25);
+                transition: left 0.35s ease-in-out;
+                padding-top: 6rem; 
+                z-index: 1000;
+                border-right: 1px solid var(--border-color);
+            }
+            nav.active {
+                left: 0; 
+            }
+            nav ul {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                padding: 0 2rem;
+            }
+            nav ul li a {
+                font-size: 1.1rem;
+                padding: 1rem 0.5rem;
+                display: block;
+                width: 100%;
+                text-align: left;
+                color: var(--text-secondary);
+            }
+            nav ul li a:hover, nav ul li a.active {
+                color: var(--accent-primary);
+                background-color: transparent;
+            }
+             nav ul li a::after {
+                left: 0;
+                transform: translateX(0);
+                bottom: 0;
+             }
+             nav ul li a:hover::after, nav ul li a.active::after {
+                width: 30px;
+             }
+
+            .contact-form { padding: 2rem 1.5rem; }
+            .hero { min-height: 80vh; padding: 3rem 0;}
+            h1 { font-size: clamp(2.2rem, 7vw, 3rem); }
+            h2 { font-size: clamp(1.8rem, 6vw, 2.5rem); }
+            .projects-grid { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
-
 <body>
+    <header id="header">
+        <div class="container">
+            <a href="#" class="logo">Bruno Caldas<span>.</span></a>
+            <nav id="main-nav">
+                <ul>
+                    <li><a href="#hero" class="nav-link active">Início</a></li>
+                    <li><a href="#sobre" class="nav-link">Sobre Mim</a></li>
+                    <li><a href="#projetos" class="nav-link">Projetos</a></li>
+                    <li><a href="#habilidades" class="nav-link">Habilidades</a></li>
+                    <li><a href="#contato" class="nav-link">Contato</a></li>
+                </ul>
+            </nav>
+            <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+        </div>
+    </header>
 
-    <!-- Rastro/Brilho do Mouse REMOVIDO -->
+    <section class="hero" id="hero">
+        <div class="container">
+            <h1 class="reveal-on-scroll">Olá, eu sou <span>Bruno Caldas</span></h1>
+                        <p class="subtitle reveal-on-scroll" data-delay="100">Desenvolvedor Full-Stack focado em construir soluções digitais robustas, desde a arquitetura de banco de dados até interfaces de usuário funcionais. Minha experiência se concentra em entregar projetos de alto impacto.</p>
+            <a href="#projetos" class="btn reveal-on-scroll" data-delay="200">Explorar Projetos</a>
+        </div>
+    </section>
 
-    <!-- Layout do App -->
-    <div class="app-layout">
-        
-        <!-- Sidebar de Navegação -->
-        <nav id="sidebar">
-            
-            <!-- (MUDANÇA FEITA) H1 Trocado por IMG -->
-            <img src="https://eqisfdigrutdfhrfyjly.supabase.co/storage/v1/object/public/personagens/menu.png" 
-                 alt="Sanyzation Logo" 
-                 class="sidebar-logo"
-                 id="logo-para-menu"> <!-- (NOVO ID) -->
-            
-            <div class="modo-botao" id="btn-iniciar-original-diario">
-                <h2>Modo Original</h2>
-                <p>O desafio diário. (1 Acerto)</p>
-            </div>
-            <div class="modo-botao" id="btn-iniciar-imagem-diario">
-                <h2>Modo Imagem</h2>
-                <p>O desafio diário com imagem. (1 Acerto)</p>
-            </div>
-            <div class="modo-botao maratona" id="btn-iniciar-original-maratona">
-                <h2>Maratona Original</h2>
-                <p>Acerte 20 personagens seguidos!</p>
-            </div>
-            <div class="modo-botao maratona" id="btn-iniciar-imagem-maratona">
-                <h2>Maratona Imagem</h2>
-                <p>Acerte 20 imagens seguidas!</p>
-            </div>
-        </nav>
-        
-        <!-- Conteúdo Principal (Direita) -->
-        <main id="main-content">
+    <section id="sobre">
+        <div class="container">
+            <div class="about-content reveal-on-scroll">
+                <h2 class="section-title" style="text-align:left; margin-left:0;">Sobre <span>Mim</span></h2>
+                                <p>Sou um desenvolvedor com experiência prática, focado na criação de soluções digitais eficientes e escaláveis. Minha trajetória é marcada pela entrega de projetos funcionais, utilizando uma abordagem de desenvolvimento ágil e orientada a resultados.</p>
+                                <p>Possuo habilidades consolidadas em plataformas Low-Code como **FlutterFlow**, e Back-end como **Firebase** e **Supabase (SQL)**, além de especialização em automações complexas com **n8n**. Meu foco é integrar essas tecnologias para transformar ideias em produtos completos, desde web-apps e aplicativos móveis até sistemas com integração de Inteligência Artificial e APIs de pagamento.</p>
+                <a href="#contato" class="btn">Entre em Contato</a>
+            </div>
+            <div class="about-image-wrapper reveal-on-scroll" data-delay="100">
+                <div class="about-image">
+                    <img src="https://i.imgur.com/XBc4G5t.jpeg" alt="Foto de Bruno Caldas">
+                </div>
+            </div>
+        </div>
+    </section>
 
-            <!-- 7. HTML - TELAS DE JOGO (Agora dentro do main-content) -->
+    <section id="projetos">
+        <div class="container">
+            <h2 class="section-title">Meus <span>Projetos</span></h2>
+            <div class="projects-grid">
+                
+                                <div class="project-card reveal-on-scroll">
+                    <div class="project-carousel">
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/HLXShjM.png" alt="MLG App Screenshot 1">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/3XwaDfF.png" alt="MLG App Screenshot 2">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/IbHJNra.png" alt="MLG App Screenshot 3">
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>Aplicativo MLG</h3>
+                        <p class="project-description">Plataforma móvel estilo TikTok, evoluída de um web-app. Usuários assistem vídeos, ganham moedas e trocam por dinheiro via Pix. Envolveu gestão de +30k leads, combinando Firebase Auth e Supabase (SQL).</p>
+                        <div class="tech-stack">
+                            <span>FlutterFlow</span><span>Firebase</span><span>Supabase</span><span>Unity Ads</span><span>API</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://play.google.com/store/apps/details?id=com.mycompany.mlgtesteb&hl=pt_BR" class="btn btn-small" target="_blank" rel="noopener noreferrer">Google Play</a>
+                            <a href="https://apps.apple.com/br/app/mlg/id6738962077" class="btn btn-small" target="_blank" rel="noopener noreferrer">App Store</a>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- 7a. Jogo Original (Diário) -->
-            <div id="tela-jogo-original-diario" class="pagina tela-jogo-base">
-                <h2>Desafio Diário - Original</h2>
-                <form id="form-palpite-original-diario" class="form-palpite-container" onsubmit="return false;">
-                    <input type="text" id="campo-palpite-original-diario" class="campo-palpite" placeholder="Carregando..." autocomplete="off" disabled>
-                    <div id="sugestoes-autocomplete-original-diario" class="sugestoes-autocomplete"></div>
-                </form>
-                <div id="grade-palpites-original-diario" class="grade-palpites">
-                    <div class="linha-palpite-header">
-                        <div class="celula">Personagem</div><div class="celula">Elemento</div><div class="celula">Temporada</div><div class="celula">Tipo</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 7b. Jogo Imagem (Diário) -->
-            <div id="tela-jogo-imagem-diario" class="pagina tela-jogo-base">
-                <h2>Desafio Diário - Imagem</h2>
-                <div class="imagem-container">
-                    <img id="personagem-imagem-diario" src="" alt="Personagem Secreto Borrado">
-                </div>
-                <form id="form-palpite-imagem-diario" class="form-palpite-container" onsubmit="return false;">
-                    <input type="text" id="campo-palpite-imagem-diario" class="campo-palpite" placeholder="Carregando..." autocomplete="off" disabled>
-                    <div id="sugestoes-autocomplete-imagem-diario" class="sugestoes-autocomplete"></div>
-                </form>
-                <div id="lista-palpites-imagem-diario" class="lista-palpites-imagem"></div>
-            </div>
-            
-            <!-- 7c. Jogo Original (Maratona) -->
-            <div id="tela-jogo-original-maratona" class="pagina tela-jogo-base">
-                <h2>Maratona Original</h2>
-                <div id="contador-original-maratona" class="contador-acertos">0 <span>/ 20</span></div>
-                <form id="form-palpite-original-maratona" class="form-palpite-container" onsubmit="return false;">
-                    <input type="text" id="campo-palpite-original-maratona" class="campo-palpite" placeholder="Carregando..." autocomplete="off" disabled>
-                    <div id="sugestoes-autocomplete-original-maratona" class="sugestoes-autocomplete"></div>
-                </form>
-                <div id="grade-palpites-original-maratona" class="grade-palpites">
-                    <div class="linha-palpite-header">
-                        <div class="celula">Personagem</div><div class="celula">Elemento</div><div class="celula">Temporada</div><div class="celula">Tipo</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 7d. Jogo Imagem (Maratona) -->
-            <div id="tela-jogo-imagem-maratona" class="pagina tela-jogo-base">
-                <h2>Maratona Imagem</h2>
-                <div id="contador-imagem-maratona" class="contador-acertos">0 <span>/ 20</span></div>
-                <div class="imagem-container">
-                    <img id="personagem-imagem-maratona" src="" alt="Personagem Aleatório Borrado">
-                </div>
-                <form id="form-palpite-imagem-maratona" class="form-palpite-container" onsubmit="return false;">
-                    <input type="text" id="campo-palpite-imagem-maratona" class="campo-palpite" placeholder="Carregando..." autocomplete="off" disabled>
-                    <div id="sugestoes-autocomplete-imagem-maratona" class="sugestoes-autocomplete"></div>
-                </form>
-                <div id="lista-palpites-imagem-maratona" class="lista-palpites-imagem"></div>
-            </div>
+                                <div class="project-card reveal-on-scroll" data-delay="50">
+                    <div class="project-carousel">
+                                                <div class="carousel-slide">
+                             <img src="https://i.imgur.com/cpsjY5k.png" alt="Checkout Screenshot 1">
+                        </div>
+                                                <div class="carousel-slide">
+                            <img src="https://i.imgur.com/Di0hHV3.png" alt="Checkout Screenshot 2">
+                        </div>
+                                                <div class="carousel-slide">
+                            <img src="https://i.imgur.com/Xh2yrRj.png" alt="Checkout Screenshot 3">
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>Checkout de Pagamentos</h3>
+                        <p class="project-description">Interface de pagamentos e checkout desenvolvida em FlutterFlow para o projeto MLG, com integração a múltiplas APIs de pagamento como Asaas, Zendry e Mercado Pago para processamento de transações.</p>
+                        <div class="tech-stack">
+                            <span>FlutterFlow</span><span>Asaas API</span><span>Zendry API</span><span>Mercado Pago API</span>
+                        </div>
+                        <div class="project-links">
+                            <a href="https://mlgpay.flutterflow.app/checkouwhite" class="btn btn-small" target="_blank" rel="noopener noreferrer">Ver Demo (Exemplo)</a>
+                        </div>
+                </div>
+                </div>
 
-        </main> <!-- Fim do #main-content -->
+                                <div class="project-card reveal-on-scroll" data-delay="100">
+                    <div class="project-carousel">
+                        <div class="carousel-slide">
+                             <img src="https://i.imgur.com/VcxFZOT.png" alt="BetNelson Bot Screenshot 1">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/TYeR3gE.png" alt="BetNelson Bot Screenshot 2">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/angbBHN.png" alt="BetNelson Bot Screenshot 3">
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>BetNelson / Palpiteiro Bot</h3>
+                        <p class="project-description">Bot para Telegram com IA para recomendações de apostas esportivas. Grupos gratuitos/VIP, feedback GREEN/RED, gestão de banca, e integrações com OpenAI, API-Football e OddsAPI.</p>
+                        <div class="tech-stack">
+                            <span>n8n</span><span>Supabase</span><span>OpenAI</span><span>Telegram API</span><span>Node.js</span>
+                        </div>
+                         <div class="project-links">
+                            <a href="https://web.telegram.org/k/#@betnelsontestebot" class="btn btn-small" target="_blank" rel="noopener noreferrer">Testar Bot Gratuito</a>
+                        </div>
+                    </div>
+                </div>
 
-    </div> <!-- Fim do .app-layout -->
-    
-    <!-- 8. HTML - Modal de Mensagem (Toast) -->
-    <div id="modal-mensagem"><span id="modal-texto"></span></div>
+                                <div class="project-card reveal-on-scroll" data-delay="200">
+                     <div class="project-carousel">
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/Y4625p.png" alt="AiPsico App Screenshot 1">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/QEjeRfK.png" alt="AiPsico App Screenshot 2">
+                        </div>
+                        <div class="carousel-slide">
+                            <img src="https://i.imgur.com/QucwRtG.png" alt="AiPsico App Screenshot 3">
+                        </div>
+                    </div>
+                    <div class="project-content">
+                        <h3>Aplicativo AiPsico</h3>
+                        <p class="project-description">Plataforma que permite a psicólogos criar avatares de IA para interagir com pacientes. Inclui painel ADM e app móvel com interface clean. Lançado nas lojas de aplicativos.</p>
+                        <div class="tech-stack">
+                            <span>FlutterFlow</span><span>Supabase</span><span>IA</span><span>UI/UX Design</span><span>Mobile</span>
+                        </div>
+                         <div class="project-links">
+                            <a href="https://play.google.com/store/apps/details?id=com.mycompany.aipsico&hl=pt_BR" class="btn btn-small" target="_blank" rel="noopener noreferrer">Google Play</a>
+                            <a href="https://apps.apple.com/br/app/aipsico/id6745515520" class="btn btn-small" target="_blank" rel="noopener noreferrer">App Store</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <!-- 9. HTML - TELA DE VITÓRIA -->
-    <div id="tela-vitoria" class="pagina">
-        <h2>Parabéns!</h2>
-        <p id="vitoria-texto">Você completou o desafio!</p>
-        <button id="btn-voltar-menu">Voltar ao Menu</button>
-    </div>
+    <section id="habilidades">
+        <div class="container">
+            <h2 class="section-title">Minhas <span>Habilidades</span></h2>
+            <div class="skills-grid">
+                <span class="skill-badge reveal-on-scroll">FlutterFlow</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="50">Firebase</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="100">Supabase</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="150">n8n Automação</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="200">Integração de APIs</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="250">Asaas API</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="300">Zendry API</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="350">Mercado Pago API</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="400">OpenAI API</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="450">Telegram Bots</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="500">Node.js (Básico)</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="550">Unity Ads</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="600">Desenvolvimento Mobile</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="650">SQL</span>
+                <span class="skill-badge reveal-on-scroll" data-delay="700">Design UI/UX (Conceitos)</span>
+            </div>
+        </div>
+    </section>
 
+    <section id="contato">
+        <div class="container">
+            <h2 class="section-title">Vamos Criar Algo <span>Incrível?</span></h2>
+            <p class="reveal-on-scroll">Estou sempre aberto a novas oportunidades, colaborações e desafios. Se você tem um projeto em mente ou gostaria de saber mais sobre meu trabalho, adoraria conversar.</p>
+            
+            <div class="contact-methods reveal-on-scroll" data-delay="50">
+                <a href="https://wa.me/5511985147943?text=Ol%C3%A1%2C%20vi%20seu%20portf%C3%B3lio%20e%20gostaria%20de%20conversar." target="_blank" rel="noopener noreferrer" class="btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.894 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 4.315 1.731 6.086l.001.004l-1.017 3.717l3.727-1.011z"></path></svg>
+                    WhatsApp
+                </a>
+                <a href="mailto:bruno.caldasm03@gmail.com" class="btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6V18C2 19.1 2.9 20 4 20H20C21.1 20 22 19.1 22 18V6ZM20 6L12 11L4 6H20ZM20 18H4V8L12 13L20 8V18Z"></path></svg>
+                    Email
+                </a>
+            </div>
+            <p class="reveal-on-scroll" data-delay="100" style="text-align:center; font-size: 0.9rem;">...ou preencha o formulário abaixo.</p>
+            
+            <form id="contactForm" class="contact-form reveal-on-scroll" data-delay="150">
+                <div class="form-group">
+                    <label for="name">Seu Nome</label>
+                    <input type="text" id="name" name="name" placeholder="Nome Completo" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Seu Email</label>
+                    <input type="email" id="email" name="email" placeholder="exemplo@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="subject">Assunto</label>
+                    <input type="text" id="subject" name="subject" placeholder="Sobre o que gostaria de falar?" required>
+                </div>
+                <div class="form-group">
+                    <label for="message">Sua Mensagem</label>
+                    <textarea id="message" name="message" rows="5" placeholder="Detalhe sua ideia ou pergunta aqui..." required></textarea>
+                </div>
+                <button type="submit" class="btn">Enviar Mensagem</button>
+            </form>
+            <div class="social-links reveal-on-scroll" data-delay="200">
+                <a href="https://www.linkedin.com/in/bruno-caldas-2449bb208/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                </a>
+                <a href="#" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.483 0-.237-.009-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.03-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.026 2.747-1.026.546 1.378.201 2.397.1 2.65.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.001 10.001 0 0 0 22 12c0-5.523-4.477-10-10-10z"></path></svg>
+                </a>
+            </div>
+        </div>
+    </section>
 
-    <!-- 10. TODO O JAVASCRIPT (Lógica Corrigida) -->
-    <script>
-        // --- 1. CONFIGURAÇÃO SUPABASE ---
-        const SUPABASE_URL = 'https://eqisfdigrutdfhrfyjly.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVxaXNmZGlncnV0ZGZocmZ5amx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIyNjUwOTAsImV4cCI6MjA3Nzg0MTA5MH0.MuWpaRzm3tUsLwJjCh8ji2LOG599NR5vl0yAFtpHoTU';
-        const { createClient } = supabase;
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="currentYear"></span> <span class="logo-footer">Bruno Caldas<span>.</span></span> Todos os direitos reservados.</p>
+        </div>
+    </footer>
 
-        const iconesElementos = {
-            'Conhecimento': 'https://eqisfdigrutdfhrfyjly.supabase.co/storage/v1/object/public/personagens/conhecimento.webp',
-            'Energia': 'https://eqisfdigrutdfhrfyjly.supabase.co/storage/v1/object/public/personagens/energia.webp',
-            'Medo': 'https://eqisfdigrutdfhrfyjly.supabase.co/storage/v1/object/public/personagens/medo.png',
-            'Sangue': 'https://eqisfdigrutdfhrfyjly.supabase.co/storage/v1/object/public/personagens/sangue.webp',
-            'Morte': 'https://eqisfdigrutdfhrfyjly.supabase.co/storage/v1/object/public/personagens/morte.webp',
-            'Todos': '', 
-            'N/A': '',
-            'Sangue / Conhecimento': '' 
-        };
-
-        // --- (CORREÇÃO CRÍTICA) Envolve TUDO em DOMContentLoaded ---
-        document.addEventListener('DOMContentLoaded', () => {
-
-            // --- 2. ELEMENTOS GLOBAIS ---
-            const todasAsPaginas = document.querySelectorAll('.pagina');
-            const modalMensagem = document.getElementById('modal-mensagem');
-            const modalTexto = document.getElementById('modal-texto');
-            const telaVitoria = document.getElementById('tela-vitoria');
-            const vitoriaTexto = document.getElementById('vitoria-texto');
-            const btnVoltarMenu = document.getElementById('btn-voltar-menu');
-
-            // --- 3. ELEMENTOS DOS MODOS ---
-            const todosOsBotoesDeModo = document.querySelectorAll('.modo-botao'); 
-            const btnIniciarOriginalDiario = document.getElementById('btn-iniciar-original-diario');
-            const btnIniciarImagemDiario = document.getElementById('btn-iniciar-imagem-diario');
-            const btnIniciarOriginalMaratona = document.getElementById('btn-iniciar-original-maratona');
-            const btnIniciarImagemMaratona = document.getElementById('btn-iniciar-imagem-maratona');
-            
-            // (NOVO) Botão do Logo
-            const logoBtn = document.getElementById('logo-para-menu');
-            
-            const telaJogoOriginalDiario = document.getElementById('tela-jogo-original-diario');
-            const inputOriginalDiario = document.getElementById('campo-palpite-original-diario');
-            const formOriginalDiario = document.getElementById('form-palpite-original-diario');
-            const sugestoesOriginalDiario = document.getElementById('sugestoes-autocomplete-original-diario');
-            const gradeOriginalDiario = document.getElementById('grade-palpites-original-diario');
-
-            const telaJogoImagemDiario = document.getElementById('tela-jogo-imagem-diario');
-            const inputImagemDiario = document.getElementById('campo-palpite-imagem-diario');
-            const formImagemDiario = document.getElementById('form-palpite-imagem-diario');
-            const sugestoesImagemDiario = document.getElementById('sugestoes-autocomplete-imagem-diario');
-            const imgImagemDiario = document.getElementById('personagem-imagem-diario');
-            const listaImagemDiario = document.getElementById('lista-palpites-imagem-diario');
-            
-            const telaJogoOriginalMaratona = document.getElementById('tela-jogo-original-maratona');
-            const inputOriginalMaratona = document.getElementById('campo-palpite-original-maratona');
-            const formOriginalMaratona = document.getElementById('form-palpite-original-maratona');
-            const sugestoesOriginalMaratona = document.getElementById('sugestoes-autocomplete-original-maratona');
-            const gradeOriginalMaratona = document.getElementById('grade-palpites-original-maratona');
-            const contadorOriginalMaratona = document.getElementById('contador-original-maratona');
-
-            const telaJogoImagemMaratona = document.getElementById('tela-jogo-imagem-maratona');
-            const inputImagemMaratona = document.getElementById('campo-palpite-imagem-maratona');
-            const formImagemMaratona = document.getElementById('form-palpite-imagem-maratona');
-            const sugestoesImagemMaratona = document.getElementById('sugestoes-autocomplete-imagem-maratona');
-            const imgImagemMaratona = document.getElementById('personagem-imagem-maratona');
-            const listaImagemMaratona = document.getElementById('lista-palpites-imagem-maratona');
-            const contadorImagemMaratona = document.getElementById('contador-imagem-maratona');
-
-            // --- 5. VARIÁVEIS GLOBAIS DO JOGO ---
-            let personagemSecretoOriginal = null;
-            let personagemSecretoImagem = null;
-            let personagemMaratonaAtual = null;
-            let jogoCarregado = false;
-            let debounceTimeout;
-            
-            let jogoOriginalDiarioEmAndamento = true;
-            let jogoImagemDiarioEmAndamento = true;
-            let palpitesImagemDiarioRestantes = 5;
-            
-            let jogoOriginalMaratonaEmAndamento = true;
-            let jogoImagemMaratonaEmAndamento = true;
-            let acertosMaratonaOriginal = 0;
-            let acertosMaratonaImagem = 0;
-            const META_ACERTOS = 20;
-
-            const BLUR_INICIAL = 20;
-            const BLUR_REDUCAO = 4;
-
-            // --- 6. NAVEGAÇÃO E INICIALIZAÇÃO ---
-
-            function mostrarTela(idTela, botaoAtivo) {
-                todasAsPaginas.forEach(pagina => {
-                    pagina.classList.remove('visivel');
-                });
-                todosOsBotoesDeModo.forEach(btn => {
-                    btn.classList.remove('ativo');
-                });
-                
-                const telaParaMostrar = document.getElementById(idTela);
-                if (telaParaMostrar) {
-                    telaParaMostrar.classList.add('visivel');
-                    if (botaoAtivo) {
-                        botaoAtivo.classList.add('ativo');
-                    }
-                } else {
-                    telaJogoOriginalDiario.classList.add('visivel');
-                    btnIniciarOriginalDiario.classList.add('ativo');
-                }
-            }
-            
-            btnVoltarMenu.addEventListener('click', () => {
-                 telaVitoria.classList.remove('visivel');
-                 mostrarTela('tela-jogo-original-diario', btnIniciarOriginalDiario);
-                 initModoOriginalDiario();
-            });
-
-            // (NOVO) Click do Logo
-            logoBtn.addEventListener('click', () => {
-                mostrarTela('tela-jogo-original-diario', btnIniciarOriginalDiario);
-                initModoOriginalDiario();
-            });
-
-            btnIniciarOriginalDiario.addEventListener('click', (e) => {
-                mostrarTela('tela-jogo-original-diario', e.currentTarget);
-                if (!jogoCarregado) carregarJogosDiarios().then(initModoOriginalDiario);
-                else initModoOriginalDiario();
-            });
-            
-            btnIniciarImagemDiario.addEventListener('click', (e) => {
-                mostrarTela('tela-jogo-imagem-diario', e.currentTarget);
-                if (!jogoCarregado) carregarJogosDiarios().then(initModoImagemDiario);
-                else initModoImagemDiario();
-            });
-
-            btnIniciarOriginalMaratona.addEventListener('click', (e) => {
-                mostrarTela('tela-jogo-original-maratona', e.currentTarget);
-                initMaratonaOriginal();
-            });
-            
-            btnIniciarImagemMaratona.addEventListener('click', (e) => {
-                mostrarTela('tela-jogo-imagem-maratona', e.currentTarget);
-                initMaratonaImagem();
-            });
-
-            async function carregarJogosDiarios() {
-                if (jogoCarregado) return;
-                
-                inputOriginalDiario.disabled = true;
-                inputImagemDiario.disabled = true;
-                inputOriginalDiario.placeholder = 'Carregando personagem do dia...';
-                inputImagemDiario.placeholder = 'Carregando personagem do dia...';
-
-                const [respOriginal, respImagem] = await Promise.all([
-                    supabaseClient.rpc('get_daily_personagem'),
-                    supabaseClient.rpc('get_daily_personagem_imagem')
-                ]);
-
-                let erro = false;
-                if (respOriginal.error || !respOriginal.data || respOriginal.data.length === 0) {
-                    console.error('Erro ao buscar personagem original:', respOriginal.error);
-                    mostrarMensagem('Erro ao carregar o jogo (Original).', 'erro');
-                    erro = true;
-                }
-                if (respImagem.error || !respImagem.data || respImagem.data.length === 0) {
-                    console.error('Erro ao buscar personagem imagem:', respImagem.error);
-                    mostrarMensagem('Erro: O personagem diário de imagem (função: get_daily_personagem_imagem) não foi encontrado. Verifique se você tem personagens com imagens válidas no DB.', 'erro');
-                    erro = true;
-                }
-
-                if (erro) return;
-
-                personagemSecretoOriginal = respOriginal.data[0];
-                personagemSecretoImagem = respImagem.data[0];
-                jogoCarregado = true;
-                
-                console.log("Secreto Original:", personagemSecretoOriginal.nome_personagem);
-                console.log("Secreto Imagem:", personagemSecretoImagem.nome_personagem);
-                
-                inputOriginalDiario.disabled = false;
-                inputImagemDiario.disabled = false;
-                inputOriginalDiario.placeholder = 'Digite o nome do personagem...';
-                inputImagemDiario.placeholder = 'Digite o nome do personagem...';
-            }
-            
-            // --- 7. LÓGICA MODO ORIGINAL (DIÁRIO) ---
-
-            function initModoOriginalDiario() {
-                while (gradeOriginalDiario.children.length > 1) {
-                    gradeOriginalDiario.removeChild(gradeOriginalDiario.lastChild);
-                }
-                jogoOriginalDiarioEmAndamento = true;
-                inputOriginalDiario.disabled = false;
-                inputOriginalDiario.placeholder = 'Digite o nome do personagem...';
-                inputOriginalDiario.value = '';
-                inputOriginalDiario.focus();
-            }
-            
-            async function processarPalpiteOriginalDiario(nomeCompleto, nomeLimpo) {
-                if (!jogoOriginalDiarioEmAndamento) return;
-                const palpiteEncontrado = await buscarDadosPersonagemPrincipal(nomeLimpo);
-                const feedback = criarFeedback(nomeCompleto, palpiteEncontrado, personagemSecretoOriginal);
-                criarLinhaDePalpiteGrade(feedback, gradeOriginalDiario);
-                if (feedback.vitoria) {
-                    mostrarTelaVitoria('diário original');
-                    jogoOriginalDiarioEmAndamento = false;
-                    inputOriginalDiario.disabled = true;
-                    inputOriginalDiario.placeholder = 'Personagem encontrado!';
-                }
-                inputOriginalDiario.value = '';
-            }
-
-            // --- 8. LÓGICA MODO IMAGEM (DIÁRIO) ---
-            
-            function initModoImagemDiario() {
-                listaImagemDiario.innerHTML = '';
-                jogoImagemDiarioEmAndamento = true;
-                palpitesImagemDiarioRestantes = 5;
-                inputImagemDiario.disabled = false;
-                inputImagemDiario.placeholder = 'Digite o nome do personagem...';
-                inputImagemDiario.value = '';
-                
-                if (personagemSecretoImagem && personagemSecretoImagem.url_imagem && personagemSecretoImagem.url_imagem !== '#PENDENTE') {
-                    imgImagemDiario.src = personagemSecretoImagem.url_imagem;
-                    imgImagemDiario.style.filter = `blur(${BLUR_INICIAL}px)`;
-                } else {
-                    imgImagemDiario.src = '';
-                    imgImagemDiario.alt = "Erro: Imagem não encontrada para este personagem.";
-                    mostrarMensagem('Personagem do dia não tem imagem. Tente outro modo.', 'erro');
-                    inputImagemDiario.disabled = true;
-                }
-                inputImagemDiario.focus();
-            }
-            
-            async function processarPalpiteImagemDiario(nomeCompleto, nomeLimpo) {
-                if (!jogoImagemDiarioEmAndamento) return;
-                
-                const itemPalpite = criarLinhaDePalpiteImagem(nomeCompleto);
-
-                if (nomeLimpo === personagemSecretoImagem.nome_limpo) {
-                    itemPalpite.classList.add('correto');
-                    listaImagemDiario.appendChild(itemPalpite);
-                    imgImagemDiario.style.filter = 'blur(0px)';
-                    mostrarTelaVitoria('diário de imagem');
-                    jogoImagemDiarioEmAndamento = false;
-                    inputImagemDiario.disabled = true;
-                    inputImagemDiario.placeholder = 'Personagem encontrado!';
-                } else {
-                    listaImagemDiario.appendChild(itemPalpite);
-                    palpitesImagemDiarioRestantes--;
-
-                    if (palpitesImagemDiarioRestantes <= 0) {
-                        imgImagemDiario.style.filter = 'blur(0px)';
-                        mostrarMensagem(`Fim de jogo! O personagem era ${personagemSecretoImagem.nome_personagem}`, 'erro');
-                        jogoImagemDiarioEmAndamento = false;
-                        inputImagemDiario.disabled = true;
-                    } else {
-                        const novoBlur = palpitesImagemDiarioRestantes * BLUR_REDUCAO;
-                        imgImagemDiario.style.filter = `blur(${novoBlur}px)`;
-                        mostrarMensagem(`Errado! ${palpitesImagemDiarioRestantes} chances restantes.`);
-                    }
-                }
-                inputImagemDiario.value = '';
-            }
-
-            // --- 9. LÓGICA MARATONA ORIGINAL ---
-            
-            async function initMaratonaOriginal() {
-                while (gradeOriginalMaratona.children.length > 1) {
-                    gradeOriginalMaratona.removeChild(gradeOriginalMaratona.lastChild);
-                }
-                jogoOriginalMaratonaEmAndamento = true;
-                acertosMaratonaOriginal = 0;
-                contadorOriginalMaratona.innerHTML = `${acertosMaratonaOriginal} <span>/ ${META_ACERTOS}</span>`;
-                inputOriginalMaratona.disabled = true;
-                await carregarProximoDesafioMaratona('original');
-                inputOriginalMaratona.disabled = false;
-                inputOriginalMaratona.focus();
-            }
-
-            async function carregarProximoDesafioMaratona(modo) {
-                const rpc = (modo === 'original') ? 'get_random_personagem_original' : 'get_random_personagem_imagem';
-                const { data, error } = await supabaseClient.rpc(rpc);
-                
-                if (error || !data || data.length === 0) {
-                    mostrarMensagem('Erro ao carregar próximo personagem.', 'erro');
-                    return false;
-                }
-                personagemMaratonaAtual = data[0];
-                console.log("Próximo desafio:", personagemMaratonaAtual.nome_personagem);
-
-                if(modo === 'imagem') {
-                    if (personagemMaratonaAtual.url_imagem && personagemMaratonaAtual.url_imagem !== '#PENDENTE') {
-                        imgImagemMaratona.src = personagemMaratonaAtual.url_imagem;
-                        imgImagemMaratona.style.filter = `blur(${BLUR_INICIAL}px)`;
-                        listaImagemMaratona.innerHTML = '';
-                        palpitesImagemRestantes = 5;
-                    } else {
-                        return carregarProximoDesafioMaratona('imagem');
-                    }
-                }
-                return true;
-            }
-            
-            async function processarPalpiteMaratonaOriginal(nomeCompleto, nomeLimpo) {
-                if (!jogoOriginalMaratonaEmAndamento) return;
-                const palpiteEncontrado = await buscarDadosPersonagemPrincipal(nomeLimpo);
-                const feedback = criarFeedback(nomeCompleto, palpiteEncontrado, personagemMaratonaAtual);
-                criarLinhaDePalpiteGrade(feedback, gradeOriginalMaratona);
-                inputOriginalMaratona.value = '';
-
-                if (feedback.vitoria) {
-                    acertosMaratonaOriginal++;
-                    contadorOriginalMaratona.innerHTML = `${acertosMaratonaOriginal} <span>/ ${META_ACERTOS}</span>`;
-                    
-                    if (acertosMaratonaOriginal >= META_ACERTOS) {
-                        mostrarTelaVitoria('Maratona Original');
-                        jogoOriginalMaratonaEmAndamento = false;
-                        inputOriginalMaratona.disabled = true;
-                    } else {
-                        mostrarMensagem(`Correto! Próximo... (${acertosMaratonaOriginal}/${META_ACERTOS})`, 'vitoria');
-                        inputOriginalMaratona.disabled = true;
-                         setTimeout(async () => {
-                            while (gradeOriginalMaratona.children.length > 1) {
-                                gradeOriginalMaratona.removeChild(gradeOriginalMaratona.lastChild);
-                            }
-                            await carregarProximoDesafioMaratona('original');
-                            inputOriginalMaratona.disabled = false;
-                            inputOriginalMaratona.focus();
-                        }, 1500);
-                    }
-                }
-            }
-
-            // --- 10. LÓGICA MARATONA IMAGEM ---
-            
-            async function initMaratonaImagem() {
-                listaImagemMaratona.innerHTML = '';
-                jogoImagemMaratonaEmAndamento = true;
-                acertosMaratonaImagem = 0;
-                contadorImagemMaratona.innerHTML = `${acertosMaratonaImagem} <span>/ ${META_ACERTOS}</span>`;
-                inputImagemMaratona.disabled = true;
-                await carregarProximoDesafioMaratona('imagem');
-                inputImagemMaratona.disabled = false;
-                inputImagemMaratona.focus();
-            }
-            
-            async function processarPalpiteMaratonaImagem(nomeCompleto, nomeLimpo) {
-                if (!jogoImagemMaratonaEmAndamento) return;
-                
-                const itemPalpite = criarLinhaDePalpiteImagem(nomeCompleto);
-                listaImagemMaratona.appendChild(itemPalpite);
-                inputImagemMaratona.value = '';
-
-                if (nomeLimpo === personagemMaratonaAtual.nome_limpo) {
-                    itemPalpite.classList.add('correto');
-                    imgImagemMaratona.style.filter = 'blur(0px)';
-                    acertosMaratonaImagem++;
-                    contadorImagemMaratona.innerHTML = `${acertosMaratonaImagem} <span>/ ${META_ACERTOS}</span>`;
-
-                    if (acertosMaratonaImagem >= META_ACERTOS) {
-                        mostrarTelaVitoria('Maratona de Imagem');
-                        jogoImagemMaratonaEmAndamento = false;
-                        inputImagemMaratona.disabled = true;
-                    } else {
-                        mostrarMensagem(`Correto! Próximo... (${acertosMaratonaImagem}/${META_ACERTOS})`, 'vitoria');
-                        inputImagemMaratona.disabled = true;
-                        setTimeout(async () => {
-                            await carregarProximoDesafioMaratona('imagem');
-                            inputImagemMaratona.disabled = false;
-                            inputImagemMaratona.focus();
-                        }, 1500);
-                    }
-
-                } else {
-                    palpitesImagemRestantes--;
-
-                    if (palpitesImagemRestantes <= 0) {
-                        imgImagemMaratona.style.filter = 'blur(0px)';
-                        mostrarMensagem(`Errado! O personagem era ${personagemMaratonaAtual.nome_personagem}. A contagem foi reiniciada!`, 'erro');
-                        acertosMaratonaImagem = 0;
-                        contadorImagemMaratona.innerHTML = `${acertosMaratonaImagem} <span>/ ${META_ACERTOS}</span>`;
-                        
-                        inputImagemMaratona.disabled = true;
-                        setTimeout(async () => {
-                            await carregarProximoDesafioMaratona('imagem');
-                            inputImagemMaratona.disabled = false;
-                            inputImagemMaratona.focus();
-                        }, 2500);
-
-                    } else {
-                        const novoBlur = palpitesImagemRestantes * BLUR_REDUCAO;
-                        imgImagemMaratona.style.filter = `blur(${novoBlur}px)`;
-                        mostrarMensagem(`Errado! ${palpitesImagemRestantes} chances restantes.`);
-                    }
-                }
-            }
-
-            // --- 11. FUNÇÕES UTILITÁRIAS COMPARTILHADAS ---
-
-            function normalizarTexto(texto) {
-                return texto.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]/g, '');
-            }
-            
-            async function buscarDadosPersonagemPrincipal(nomeLimpo) {
-                 const { data, error } = await supabaseClient.from('personagens_ordem').select('*').eq('nome_limpo', nomeLimpo).single();
-                return (error || !data) ? null : data;
-            }
-
-            function handleAutocomplete(termo, containerSugestoes, onSelectCallback) {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(async () => {
-                    if (termo.length < 2) {
-                        limparSugestoes(containerSugestoes);
-                        return;
-                    }
-                    
-                    const termoLimpo = normalizarTexto(termo);
-                    const { data, error } = await supabaseClient.from('personagens_autocompletar').select('nome_completo, nome_limpo').ilike('nome_limpo', `%${termoLimpo}%`).limit(8);
-
-                    if (error) { console.error("Erro ao buscar sugestões:", error); return; }
-                    
-                    exibirSugestoes(data, containerSugestoes, onSelectCallback);
-                }, 250);
-            }
-
-            function exibirSugestoes(sugestoes, container, onSelectCallback) {
-                limparSugestoes(container);
-                sugestoes.forEach(personagem => {
-                    const item = document.createElement('div');
-                    item.classList.add('sugestao-item');
-                    item.textContent = personagem.nome_completo;
-                    item.addEventListener('click', () => {
-                        limparSugestoes(container);
-                        onSelectCallback(personagem.nome_completo, personagem.nome_limpo);
-                    });
-                    container.appendChild(item);
-                });
-            }
-
-            function limparSugestoes(container) { container.innerHTML = ''; }
-            
-            function mostrarMensagem(texto, tipo = '') {
-                 modalTexto.textContent = texto;
-                 modalMensagem.className = '';
-                 modalMensagem.classList.add('visivel');
-                 if (tipo) modalMensagem.classList.add(tipo);
-                 setTimeout(() => { modalMensagem.classList.remove('visivel'); }, 2500);
-            }
-            
-            function criarFeedback(nomeCompleto, palpiteEncontrado, personagemSecreto) {
-                const feedback = {
-                    nome: { valor: nomeCompleto, status: 'cinza' },
-                    elemento: { valor: '???', status: 'cinza' },
-                    temporada: { valor: '???', status: 'cinza' },
-                    tipo: { valor: '???', status: 'cinza' },
-                    vitoria: false
-                };
-
-                if (palpiteEncontrado && personagemSecreto) {
-                    feedback.elemento.valor = palpiteEncontrado.elemento_principal;
-                    feedback.temporada.valor = palpiteEncontrado.temporada_estreia;
-                    feedback.tipo.valor = palpiteEncontrado.tipo_personagem;
-
-                    if (palpiteEncontrado.elemento_principal === personagemSecreto.elemento_principal) feedback.elemento.status = 'verde';
-                    else if (personagemSecreto.elemento_principal.includes(palpiteEncontrado.elemento_principal)) feedback.elemento.status = 'amarelo';
-                    
-                    if (palpiteEncontrado.temporada_estreia === personagemSecreto.temporada_estreia) feedback.temporada.status = 'verde';
-                    if (palpiteEncontrado.tipo_personagem === personagemSecreto.tipo_personagem) feedback.tipo.status = 'verde';
-
-                    if (palpiteEncontrado.nome_limpo === personagemSecreto.nome_limpo) {
-                        feedback.vitoria = true;
-                        feedback.nome.status = 'verde';
-                        feedback.elemento.status = 'verde';
-                        feedback.temporada.status = 'verde';
-                        feedback.tipo.status = 'verde';
-                    }
-                }
-                return feedback;
-            }
-
-            function criarLinhaDePalpiteGrade(feedback, gradeElement) {
-                const novaLinha = document.createElement('div');
-                novaLinha.classList.add('linha-palpite');
-                
-                let iconeHtml = '';
-                const elementoValor = feedback.elemento.valor;
-
-                if (iconesElementos[elementoValor]) {
-                    iconeHtml = `<img src="${iconesElementos[elementoValor]}" class="elemento-icon" alt="${elementoValor}">`;
-                } else if (elementoValor === 'Sangue / Conhecimento') {
-                    iconeHtml = `<img src="${iconesElementos['Sangue']}" class="elemento-icon" alt="Sangue">
-                                 <img src="${iconesElementos['Conhecimento']}" class="elemento-icon" alt="Conhecimento">`;
-                }
-
-                novaLinha.innerHTML = `
-                    <div class="celula nome ${feedback.nome.status}">${feedback.nome.valor}</div>
-                    <div class="celula elemento ${feedback.elemento.status}">
-                        ${iconeHtml}
-                        <span>${feedback.elemento.valor}</span>
-                    </div>
-                    <div class="celula temporada ${feedback.temporada.status}">${feedback.temporada.valor}</div>
-                    <div class="celula tipo ${feedback.tipo.status}">${feedback.tipo.valor}</div>
-                `;
-                
-                gradeElement.appendChild(novaLinha);
-
-                const cells = novaLinha.querySelectorAll('.celula');
-                cells.forEach((cell, index) => {
-                    cell.style.animationDelay = `${index * 0.1}s`;
-                });
-            }
-
-            function criarLinhaDePalpiteImagem(nomeCompleto) {
-                const itemPalpite = document.createElement('div');
-                itemPalpite.classList.add('item-palpite-imagem');
-                itemPalpite.textContent = nomeCompleto;
-                return itemPalpite;
-            }
-
-            function mostrarTelaVitoria(modo) {
-                vitoriaTexto.textContent = `Você completou o desafio: ${modo}!`;
-                telaVitoria.classList.add('visivel');
-            }
-            
-            // --- (CORREÇÃO) ADICIONA OS OUVINTES DE EVENTO QUE FALTAVAM ---
-            
-            inputOriginalDiario.addEventListener('input', (e) => {
-                handleAutocomplete(e.target.value, sugestoesOriginalDiario, (nomeCompleto, nomeLimpo) => {
-                    inputOriginalDiario.value = nomeCompleto;
-                    processarPalpiteOriginalDiario(nomeCompleto, nomeLimpo);
-                });
-            });
-            formOriginalDiario.addEventListener('submit', (e) => {
-                e.preventDefault(); if (!jogoOriginalDiarioEmAndamento) return;
-                const palpiteCompleto = inputOriginalDiario.value;
-                if (palpiteCompleto && palpiteCompleto.length > 2) {
-                    const nomeLimpo = normalizarTexto(palpiteCompleto);
-                    limparSugestoes(sugestoesOriginalDiario);
-                    processarPalpiteOriginalDiario(palpiteCompleto, nomeLimpo);
-                }
-            });
-            
-            inputImagemDiario.addEventListener('input', (e) => {
-                handleAutocomplete(e.target.value, sugestoesImagemDiario, (nomeCompleto, nomeLimpo) => {
-                    inputImagemDiario.value = nomeCompleto;
-                    processarPalpiteImagemDiario(nomeCompleto, nomeLimpo);
-                });
-            });
-            formImagemDiario.addEventListener('submit', (e) => {
-                e.preventDefault(); if (!jogoImagemDiarioEmAndamento) return;
-                const palpiteCompleto = inputImagemDiario.value;
-                if (palpiteCompleto && palpiteCompleto.length > 2) {
-                    const nomeLimpo = normalizarTexto(palpiteCompleto);
-                    limparSugestoes(sugestoesImagemDiario);
-                    processarPalpiteImagemDiario(palpiteCompleto, nomeLimpo);
-                }
-            });
-
-            inputOriginalMaratona.addEventListener('input', (e) => {
-                handleAutocomplete(e.target.value, sugestoesOriginalMaratona, (nomeCompleto, nomeLimpo) => {
-                    inputOriginalMaratona.value = nomeCompleto;
-                    processarPalpiteMaratonaOriginal(nomeCompleto, nomeLimpo);
-                });
-            });
-            formOriginalMaratona.addEventListener('submit', (e) => {
-                e.preventDefault(); if (!jogoOriginalMaratonaEmAndamento) return;
-                const palpiteCompleto = inputOriginalMaratona.value;
-                if (palpiteCompleto && palpiteCompleto.length > 2) {
-                    const nomeLimpo = normalizarTexto(palpiteCompleto);
-                    limparSugestoes(sugestoesOriginalMaratona);
-                    processarPalpiteMaratonaOriginal(palpiteCompleto, nomeLimpo);
-                }
-            });
-
-            inputImagemMaratona.addEventListener('input', (e) => {
-                handleAutocomplete(e.target.value, sugestoesImagemMaratona, (nomeCompleto, nomeLimpo) => {
-                    inputImagemMaratona.value = nomeCompleto;
-                    processarPalpiteMaratonaImagem(nomeCompleto, nomeLimpo);
-                });
-            });
-            formImagemMaratona.addEventListener('submit', (e) => {
-                e.preventDefault(); if (!jogoImagemMaratonaEmAndamento) return;
-                const palpiteCompleto = inputImagemMaratona.value;
-                if (palpiteCompleto && palpiteCompleto.length > 2) {
-                    const nomeLimpo = normalizarTexto(palpiteCompleto);
-                    limparSugestoes(sugestoesImagemMaratona);
-                    processarPalpiteMaratonaImagem(palpiteCompleto, nomeLimpo);
-                }
-            });
-
-            // --- FIM DOS OUVINTES DE EVENTO ---
+    <script>
+        // Menu Mobile
+        const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+        const mainNav = document.getElementById('main-nav');
+        const navLinks = document.querySelectorAll('#main-nav a');
+        const menuIconOpen = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
+        const menuIconClose = '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
 
 
-            // --- INICIALIZAÇÃO DO JOGO ---
-            carregarJogosDiarios();
-            mostrarTela('tela-jogo-original-diario', btnIniciarOriginalDiario);
-            initModoOriginalDiario();
-            
-            // --- LÓGICA DO RASTRO DO MOUSE (Removida) ---
-            
-        }); // <-- FIM DO DOMContentLoaded
-        
-    </script>
+        mobileMenuToggle.addEventListener('click', () => {
+            mainNav.classList.toggle('active');
+            mobileMenuToggle.innerHTML = mainNav.classList.contains('active') ? menuIconClose : menuIconOpen;
+        });
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (mainNav.classList.contains('active')) {
+                    mainNav.classList.remove('active');
+                    mobileMenuToggle.innerHTML = menuIconOpen;
+                }
+            });
+        });
+        
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        const revealElements = document.querySelectorAll('.reveal-on-scroll');
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const delay = parseInt(entry.target.dataset.delay) || 0;
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, delay);
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, { threshold: 0.05 }); // Trigger a bit earlier
+
+        revealElements.forEach(el => {
+            revealObserver.observe(el);
+        });
+
+        const sections = document.querySelectorAll('section[id]');
+        const headerHeight = document.getElementById('header').offsetHeight;
+        window.addEventListener('scroll', navHighlighter);
+
+        function navHighlighter() {
+            let scrollY = window.pageYOffset;
+            sections.forEach(current => {
+                const sectionHeight = current.offsetHeight;
+                const sectionTop = current.offsetTop - headerHeight - 20; // Ajuste para header e um pouco mais
+                let sectionId = current.getAttribute('id');
+                
+                const navLink = document.querySelector('nav a[href="#' + sectionId + '"]'); // Correção no seletor
+                if (navLink) { 
+                    if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight){ // >= e < para melhor precisão
+                        document.querySelectorAll('nav a.active').forEach(activeLink => {
+                            activeLink.classList.remove('active');
+                        });
+                        navLink.classList.add('active');
+                    } else {
+                        navLink.classList.remove('active');
+                    }
+                }
+            });
+             // Ativar o primeiro link se estiver no topo
+            if (scrollY < sections[0].offsetTop - headerHeight - 20) {
+                document.querySelectorAll('nav a.active').forEach(activeLink => {
+                    activeLink.classList.remove('active');
+                });
+                const firstLink = document.querySelector('nav a[href="#' + sections[0].id + '"]');
+                if (firstLink) firstLink.classList.add('active');
+            }
+        }
+        navHighlighter(); // Chamar no carregamento
+
+
+        const contactForm = document.getElementById('contactForm');
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = encodeURIComponent(document.getElementById('name').value);
+            const email = encodeURIComponent(document.getElementById('email').value);
+            const subject = encodeURIComponent(document.getElementById('subject').value);
+            const message = encodeURIComponent(document.getElementById('message').value);
+            
+            const mailtoLink = `mailto:bruno.caldasm03@gmail.com?subject=${subject} - Contato Portfólio (${name})&body=Nome: ${name}%0D%0AEmail: ${email}%0D%0A%0D%0AMensagem:%0D%0A${message}`;
+            
+            window.location.href = mailtoLink;
+        });
+
+        // >>> NOVO: SCRIPT DO CARROSSEL AUTOMÁTICO <<<
+        function initAutoScrollCarousels() {
+            const carousels = document.querySelectorAll('.project-carousel');
+
+            carousels.forEach(carousel => {
+                let scrollInterval = null;
+
+                const startAutoScroll = () => {
+                    // Limpa qualquer intervalo anterior para evitar aceleração
+                    clearInterval(scrollInterval);
+                    
+                    scrollInterval = setInterval(() => {
+                        let nextScrollLeft = carousel.scrollLeft + carousel.clientWidth;
+                        
+                        // Se estiver no final, volta para o começo
+                        if (nextScrollLeft >= carousel.scrollWidth) {
+                            nextScrollLeft = 0;
+                        }
+                        
+                        carousel.scrollTo({
+                            left: nextScrollLeft,
+                            behavior: 'smooth'
+                        });
+                    }, 3000); // Muda de imagem a cada 3 segundos
+                };
+
+                const stopAutoScroll = () => {
+                    clearInterval(scrollInterval);
+                };
+
+                // Pausa quando o mouse está sobre o carrossel
+                carousel.addEventListener('mouseenter', stopAutoScroll);
+                // Retoma quando o mouse sai
+                carousel.addEventListener('mouseleave', startAutoScroll);
+
+                // Inicia a rolagem automática
+                startAutoScroll();
+            });
+        }
+
+        // Adiciona a chamada da nova função ao carregar o DOM
+        document.addEventListener('DOMContentLoaded', initAutoScrollCarousels);
+
+    </script>
 </body>
 </html>
